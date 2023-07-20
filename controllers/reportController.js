@@ -63,7 +63,7 @@ const getReportDetail = async (req, res) => {
     const report = await Report.findById(req.params.id).populate({
       path: "user_id",
       select:
-        "_id firstName middleName lastName userType subjectArea gradeLevel branch",
+        "_id username firstName middleName lastName userType subjectArea gradeLevel branch",
       populate: [
         { path: "userType", select: "userType" },
         { path: "subjectArea", select: "subjectArea" },
