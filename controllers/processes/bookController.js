@@ -41,7 +41,7 @@ const getBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id)
       .select(
-        "-supplier -numberOfCopies -numberOfSoldCopies -numberOfLostCopies -numberOfDamagedCopies -dateCreated"
+        "-supplier -numberOfSoldCopies -numberOfLostCopies -numberOfDamagedCopies -dateCreated"
       )
       .populate({
         path: "gradeLevel",
