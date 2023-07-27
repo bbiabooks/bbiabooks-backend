@@ -133,11 +133,11 @@ userSchema.statics.signup = async function (
   cloudinary_id
 ) {
   // Check length
-  if (username.length < 6) {
+  if (username.length < 8) {
     throw Error("Please enter at least 8 characters in the username.");
   }
   // Check if strong password
-  if (password.length < 6) {
+  if (password.length < 8) {
     throw Error("Please enter at least 8 characters in the password.");
   }
 

@@ -59,6 +59,20 @@ const createSignupDetail = async (req, res) => {
       });
     }
 
+    // Check length
+    if (username.length < 8) {
+      throw Error("Please enter at least 8 characters in the username.");
+    }
+    // Check if strong password
+    if (password.length < 8) {
+      throw Error("Please enter at least 8 characters in the password.");
+    }
+
+    const mobileNumberRegex = /^09\d{9}$|^639\d{9}$/;
+    if (!mobileNumberRegex.test(phoneNumber)) {
+      throw new Error("Please check your contact number.");
+    }
+
     const user = await User.findOne({ username });
     const fullname = await User.findOne({ firstName, middleName, lastName });
     if (fullname) {
