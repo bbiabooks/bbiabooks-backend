@@ -44,6 +44,7 @@ const createOrder = async (req, res) => {
     }
 
     // Upload the proofOfPayment if it exists
+    let result = null; // Default value for result
     if (req.file) {
       result = await cloudinary.uploader.upload(req.file.path);
     }

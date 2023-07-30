@@ -57,6 +57,7 @@ const createBookDetail = async (req, res) => {
       throw new Error("Book already exists.");
     } else {
       // Upload the coverImage if it exists
+      let result = null; // Default value for result
       if (req.file) {
         result = await cloudinary.uploader.upload(req.file.path);
       }
