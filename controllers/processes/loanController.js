@@ -85,7 +85,7 @@ const getOwnLoans = async (req, res) => {
       .select("_id book loanStatus bookStatus dueDate updatedAt")
       .populate({
         path: "book",
-        select: "_id title subjectArea gradeLevel",
+        select: "_id title subjectArea gradeLevel coverImage",
       })
       .sort({ createdAt: -1 });
 

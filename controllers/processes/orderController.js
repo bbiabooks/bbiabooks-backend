@@ -92,7 +92,7 @@ const getOwnOrders = async (req, res) => {
       )
       .populate({
         path: "book",
-        select: "_id title purchasePrice imageCover ",
+        select: "_id title purchasePrice coverImage",
       })
       .sort({ createdAt: -1 });
 
