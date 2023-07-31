@@ -35,11 +35,11 @@ const getLoanDetail = async (req, res) => {
       });
 
     if (!loan) {
-      return res.status(404).json({ message: "Loan not found" });
+      return res.status(404).json({ message: "Borrowed Book not found" });
     } else {
       // store report
       const user_id = req.userInfo.id;
-      const action = `Accessed loan ${req.params.id} details.`;
+      const action = `Accessed borrowed book ${req.params.id} details.`;
       const newReport = new Report({
         user_id,
         action,
@@ -64,7 +64,7 @@ const updateLoanDetail = async (req, res) => {
   });
 
   if (!updatedLoan) {
-    return res.status(404).json({ message: "No such Loan" });
+    return res.status(404).json({ message: "No such Borrowed Book" });
   } else {
     let loanStatus = updatedLoan.loanStatus;
     let bookStatus = updatedLoan.bookStatus;
@@ -114,7 +114,7 @@ const updateLoanDetail = async (req, res) => {
 
     // store report
     const user_id = req.userInfo.id;
-    const action = `Updated loan ${id}.`;
+    const action = `Updated borrowed book ${id}.`;
     const newReport = new Report({
       user_id,
       action,
@@ -122,7 +122,7 @@ const updateLoanDetail = async (req, res) => {
     await newReport.save();
 
     res.status(201).json({
-      message: "Loan updated successfully",
+      message: "Borrowed Book updated successfully",
       updatedLoan,
     });
   }
@@ -136,7 +136,7 @@ const deleteLoanDetail = async (req, res) => {
     let loan = await Loan.findById(req.params.id).select("_id book");
 
     if (!loan) {
-      return res.status(404).json({ message: "Loan not found" });
+      return res.status(404).json({ message: "Borrowed Book not found" });
     } else {
       const book = loan.book;
 
@@ -163,7 +163,7 @@ const deleteLoanDetail = async (req, res) => {
       await newReport.save();
 
       res.status(201).json({
-        message: "Loan deleted successfully",
+        message: "Borrowed Book deleted successfully",
       });
     }
   } catch (error) {
