@@ -11,7 +11,7 @@ const getLoanDetail = async (req, res) => {
     const loan = await Loan.findById(req.params.id)
       .populate({
         path: "book",
-        select: "title subjectArea gradeLevel",
+        select: "title subjectArea gradeLevel coverImage",
         populate: [
           { path: "subjectArea", select: "subjectArea" },
           { path: "gradeLevel", select: "gradeLevel" },
