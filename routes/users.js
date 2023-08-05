@@ -28,13 +28,7 @@ router.post(
   adminAuth,
   userSignup
 ); // Create a new User + Signup
-router.patch(
-  "/admin/:id",
-  upload.single("idPhoto"),
-  userAuth,
-  adminAuth,
-  updateUser
-); // Update a User by ID
+router.patch("/admin/:id", upload.single("idPhoto"), userAuth, updateUser); // Update a User by ID
 router.delete("/admin/:id", userAuth, adminAuth, deleteUser); // Delete a User by ID
 
 /** --- ALL --- */
