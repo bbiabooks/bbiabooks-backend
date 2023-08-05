@@ -8,7 +8,9 @@ const mongoose = require("mongoose");
 const getUserTable = async (req, res) => {
   try {
     const userTable = await User.find()
-      .select("username firstName middleName lastName dateRegistered")
+      .select(
+        "username firstName middleName lastName dateRegistered userStatus"
+      )
       .populate({
         path: "userType",
         select: "userType",
