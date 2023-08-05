@@ -110,6 +110,22 @@ const updateLoanDetail = async (req, res) => {
           new: true,
         }
       );
+    } else if (loanStatus === "rejected") {
+      const book = updatedLoan.book;
+
+      const books = await Book.findById(book).select(
+        "_id numberOfCopies numberOfLoanedOutCopies"
+      );
+      const numberOfCopies = books.numberOfCopies + 1;
+      const numberOfLoanedOutCopies = books.numberOfLoanedOutCopies - 1;
+
+      const updatedBook = await Book.findByIdAndUpdate(
+        book,
+        { numberOfCopies, numberOfLoanedOutCopies },
+        {
+          new: true,
+        }
+      );
     }
 
     // store report

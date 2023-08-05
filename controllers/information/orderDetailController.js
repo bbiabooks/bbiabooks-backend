@@ -79,6 +79,19 @@ const updateOrderDetail = async (req, res) => {
           new: true,
         }
       );
+    } else if (orderStatus === "rejected") {
+      const book = order.book;
+
+      const books = await Book.findById(book).select("_id numberOfCopies");
+      const numberOfCopies = books.numberOfCopies + 1;
+
+      const updatedBook = await Book.findByIdAndUpdate(
+        book,
+        { numberOfCopies },
+        {
+          new: true,
+        }
+      );
     }
 
     let result;
