@@ -79,7 +79,18 @@ const updateOrderDetail = async (req, res) => {
           new: true,
         }
       );
-    } else if (orderStatus === "rejected") {
+
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Released order ${id}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
+    }
+
+    if (orderStatus === "rejected") {
       const book = order.book;
 
       const books = await Book.findById(book).select("_id numberOfCopies");
@@ -92,6 +103,15 @@ const updateOrderDetail = async (req, res) => {
           new: true,
         }
       );
+
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Rejected order ${id}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
     }
 
     let result;
@@ -105,26 +125,26 @@ const updateOrderDetail = async (req, res) => {
 
       // Upload the new image
       result = await cloudinary.uploader.upload(req.file.path);
+
+      const updatedOrderData = {
+        ...req.body,
+        proofOfPayment: req.file ? result?.secure_url : order.proofOfPayment,
+        cloudinary_id: req.file ? result?.public_id : order.cloudinary_id,
+      };
+
+      const updatedOrder = await Order.findByIdAndUpdate(id, updatedOrderData, {
+        new: true,
+      });
+
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Updated payment status for order ${id}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
     }
-
-    const updatedOrderData = {
-      ...req.body,
-      proofOfPayment: req.file ? result?.secure_url : order.proofOfPayment,
-      cloudinary_id: req.file ? result?.public_id : order.cloudinary_id,
-    };
-
-    const updatedOrder = await Order.findByIdAndUpdate(id, updatedOrderData, {
-      new: true,
-    });
-
-    // store report
-    const user_id = req.userInfo.id;
-    const action = `Updated order ${id}.`;
-    const newReport = new Report({
-      user_id,
-      action,
-    });
-    await newReport.save();
 
     res.status(201).json({
       message: "Order updated successfully",

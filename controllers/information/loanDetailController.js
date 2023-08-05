@@ -85,10 +85,18 @@ const updateLoanDetail = async (req, res) => {
           new: true,
         }
       );
-    } else if (
-      loanStatus === "returned" &&
-      (bookStatus === "damaged" || "lost")
-    ) {
+
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Successfully returned borrowed book ${id}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
+    }
+
+    if (loanStatus === "returned" && (bookStatus === "damaged" || "lost")) {
       const book = updatedLoan.book;
 
       const books = await Book.findById(book).select(
@@ -110,7 +118,18 @@ const updateLoanDetail = async (req, res) => {
           new: true,
         }
       );
-    } else if (loanStatus === "rejected") {
+
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Reported borrowed book ${id} as ${bookStatus}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
+    }
+
+    if (loanStatus === "rejected") {
       const book = updatedLoan.book;
 
       const books = await Book.findById(book).select(
@@ -126,16 +145,16 @@ const updateLoanDetail = async (req, res) => {
           new: true,
         }
       );
-    }
 
-    // store report
-    const user_id = req.userInfo.id;
-    const action = `Updated borrowed book ${id}.`;
-    const newReport = new Report({
-      user_id,
-      action,
-    });
-    await newReport.save();
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Rejected borrowed book ${id}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
+    }
 
     res.status(201).json({
       message: "Borrowed Book updated successfully",
