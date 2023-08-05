@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const genderEnum = ["Male", "Female"];
+const statusEnum = ["Active", "Suspended"];
 
 const userSchema = new mongoose.Schema(
   {
@@ -89,6 +90,11 @@ const userSchema = new mongoose.Schema(
     },
     cloudinary_id: {
       type: String,
+    },
+    userStatus: {
+      type: String,
+      enum: statusEnum,
+      default: "Active",
     },
     dateRegistered: {
       type: Date,
@@ -188,6 +194,7 @@ userSchema.statics.signup = async function (
     phoneNumber,
     idPhoto,
     cloudinary_id,
+    userStatus,
   });
 
   return userInfo;
@@ -204,9 +211,9 @@ userSchema.statics.login = async function (username, password) {
     throw Error("Incorrect username.");
   }
 
-  // Check if the user is deleted
-  if (userInfo.isDeleted === 1) {
-    throw Error("Incorrect username.");
+  // Check if the user is suspended/deleted
+  if (userInfo.userStatus === "Suspended") {
+    throw Error("Your account is currently Suspended.");
   }
 
   // Check if the password and password hash match
