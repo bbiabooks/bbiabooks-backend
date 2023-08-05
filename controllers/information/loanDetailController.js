@@ -121,7 +121,7 @@ const updateLoanDetail = async (req, res) => {
 
       // store report
       const user_id = req.userInfo.id;
-      const action = `Reported borrowed book ${id} as ${bookStatus}.`;
+      const action = `Reported borrowed book ${id} as ${updatedLoan.bookStatus}.`;
       const newReport = new Report({
         user_id,
         action,
