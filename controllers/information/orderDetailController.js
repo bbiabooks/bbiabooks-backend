@@ -59,15 +59,56 @@ const getOrderDetail = async (req, res) => {
 // Update a single Order
 const updateOrderDetail = async (req, res) => {
   const { id } = req.params;
-  let order = await Order.findById(id);
 
-  if (!order) {
+  const updatedOrder = await Order.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
+
+  if (!updatedOrder) {
     return res.status(404).json({ message: "No such Order" });
   } else {
-    let orderStatus = order.orderStatus;
+    let orderStatus = updatedOrder.orderStatus;
+    let result;
+
+    // Check if a new photo is provided
+    if (req.file) {
+      // Remove the previous image from cloudinary
+      if (updatedOrder.cloudinary_id) {
+        await cloudinary.uploader.destroy(updatedOrder.cloudinary_id);
+
+        const updatedOrderData = {
+          proofOfPayment: req.file
+            ? result?.secure_url
+            : updatedOrder.proofOfPayment,
+          cloudinary_id: req.file
+            ? result?.public_id
+            : updatedOrder.cloudinary_id,
+        };
+
+        const updatedOrder = await Order.findByIdAndUpdate(
+          id,
+          updatedOrderData,
+          {
+            new: true,
+          }
+        );
+
+        // store report
+        const user_id = req.userInfo.id;
+        const action = `Updated proof of payment for order ${id}.`;
+        const newReport = new Report({
+          user_id,
+          action,
+        });
+        await newReport.save();
+      }
+
+      // Upload the new image
+      result = await cloudinary.uploader.upload(req.file.path);
+    }
 
     if (orderStatus === "released") {
-      const book = order.book;
+      const book = updatedOrder.book;
 
       const books = await Book.findById(book).select("_id numberOfSoldCopies");
       const numberOfSoldCopies = books.numberOfSoldCopies + 1;
@@ -79,10 +120,19 @@ const updateOrderDetail = async (req, res) => {
           new: true,
         }
       );
+
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Updated status for order ${id} as ${updatedOrder.orderStatus}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
     }
 
     if (orderStatus === "rejected") {
-      const book = order.book;
+      const book = updatedOrder.book;
 
       const books = await Book.findById(book).select("_id numberOfCopies");
       const numberOfCopies = books.numberOfCopies + 1;
@@ -94,39 +144,16 @@ const updateOrderDetail = async (req, res) => {
           new: true,
         }
       );
+
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Updated status for order ${id} as ${updatedOrder.orderStatus}.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
     }
-
-    let result;
-
-    // Check if a new photo is provided
-    if (req.file) {
-      // Remove the previous image from cloudinary
-      if (order.cloudinary_id) {
-        await cloudinary.uploader.destroy(order.cloudinary_id);
-      }
-
-      // Upload the new image
-      result = await cloudinary.uploader.upload(req.file.path);
-    }
-
-    const updatedOrderData = {
-      ...req.body,
-      proofOfPayment: req.file ? result?.secure_url : order.proofOfPayment,
-      cloudinary_id: req.file ? result?.public_id : order.cloudinary_id,
-    };
-
-    const updatedOrder = await Order.findByIdAndUpdate(id, updatedOrderData, {
-      new: true,
-    });
-
-    // store report
-    const user_id = req.userInfo.id;
-    const action = `Updated order status for order ${id} as ${order.orderStatus}.`;
-    const newReport = new Report({
-      user_id,
-      action,
-    });
-    await newReport.save();
 
     res.status(201).json({
       message: "Order updated successfully",
