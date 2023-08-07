@@ -68,6 +68,8 @@ const updateOrderDetail = async (req, res) => {
     return res.status(404).json({ message: "No such Order" });
   } else {
     let orderStatus = updatedOrder.orderStatus;
+    const book = updatedOrder.book;
+    const quantity = updatedOrder.quantity;
     let result;
 
     // Check if a new photo is provided
@@ -108,10 +110,8 @@ const updateOrderDetail = async (req, res) => {
     }
 
     if (orderStatus === "released") {
-      const book = updatedOrder.book;
-
       const books = await Book.findById(book).select("_id numberOfSoldCopies");
-      const numberOfSoldCopies = books.numberOfSoldCopies + 1;
+      const numberOfSoldCopies = books.numberOfSoldCopies + quantity;
 
       const updatedBook = await Book.findByIdAndUpdate(
         book,
@@ -132,10 +132,8 @@ const updateOrderDetail = async (req, res) => {
     }
 
     if (orderStatus === "rejected") {
-      const book = updatedOrder.book;
-
       const books = await Book.findById(book).select("_id numberOfCopies");
-      const numberOfCopies = books.numberOfCopies + 1;
+      const numberOfCopies = books.numberOfCopies + quantity;
 
       const updatedBook = await Book.findByIdAndUpdate(
         book,
@@ -167,7 +165,7 @@ const updateOrderDetail = async (req, res) => {
 // Delete an Order
 const deleteOrderDetail = async (req, res) => {
   try {
-    let order = await Order.findById(req.params.id).select("_id book");
+    let order = await Order.findById(req.params.id).select("_id book quantity");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -178,9 +176,10 @@ const deleteOrderDetail = async (req, res) => {
       }
 
       const book = order.book;
+      const quantity = order.quantity;
 
       const books = await Book.findById(book).select("_id numberOfCopies");
-      const numberOfCopies = books.numberOfCopies + 1;
+      const numberOfCopies = books.numberOfCopies + quantity;
 
       const updatedBook = await Book.findByIdAndUpdate(
         book,

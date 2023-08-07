@@ -44,6 +44,9 @@ const orderSchema = new mongoose.Schema(
     proofOfPayment: {
       type: String,
     },
+    quantity: {
+      type: Number,
+    },
     createdAt: {
       type: Date,
       immutable: true,

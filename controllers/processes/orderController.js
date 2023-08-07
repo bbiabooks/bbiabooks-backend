@@ -11,12 +11,13 @@ const path = require("path");
 // Create a new Order
 const createOrder = async (req, res) => {
   try {
-    const { book, paymentMethod, reservedFor, orderStatus } = req.body;
+    const { book, paymentMethod, reservedFor, orderStatus, quantity } =
+      req.body;
     const user_id = req.userInfo.id;
     let arrivalDate;
 
     // Check if required field is empty
-    const requiredFields = ["book", "reservedFor"];
+    const requiredFields = ["book", "reservedFor", "quantity"];
 
     // If there's empty
     const emptyFields = requiredFields.filter((field) => !req.body[field]);
@@ -32,7 +33,7 @@ const createOrder = async (req, res) => {
 
     if (numberOfCopies > 3) {
       arrivalDate = Date.now();
-      numberOfCopies = numberOfCopies - 1;
+      numberOfCopies = numberOfCopies - quantity;
 
       const updatedBook = await Book.findByIdAndUpdate(
         book,
@@ -57,6 +58,7 @@ const createOrder = async (req, res) => {
       user_id,
       arrivalDate,
       orderStatus,
+      quantity,
       proofOfPayment: result ? result.secure_url : "",
       cloudinary_id: result ? result.public_id : "",
     });
