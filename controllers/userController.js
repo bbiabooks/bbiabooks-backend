@@ -205,7 +205,9 @@ const getUser = async (req, res) => {
 // Update a User
 const updateUser = async (req, res) => {
   const { id } = req.params;
+  const { password } = req.body;
   let user = await User.findById(id);
+  let changePass = await Password.findOne({ userId: id });
 
   try {
     if (!user) {
@@ -233,6 +235,28 @@ const updateUser = async (req, res) => {
       const updatedUser = await User.findByIdAndUpdate(id, updatedUserData, {
         new: true,
       }).populate({ path: "userInfo", strictPopulate: false });
+
+      if (password) {
+        const _id = changePass._id;
+        const changeStatus = "approved";
+
+        const updatedPassword = await Password.findByIdAndUpdate(
+          _id,
+          { changeStatus },
+          {
+            new: true,
+          }
+        );
+
+        // store report
+        const user_id = req.userInfo.id;
+        const action = `Approved change password for ${id}.`;
+        const newReport = new Report({
+          user_id,
+          action,
+        });
+        await newReport.save();
+      }
 
       // store report
       const user_id = req.userInfo.id;
@@ -341,7 +365,8 @@ const getPassword = async (req, res) => {
   try {
     const user = await Password.findById(req.params.id).populate({
       path: "userId",
-      select: "firstName lastName branch userType subjectArea gradeLevel",
+      select:
+        "firstName lastName branch userType subjectArea gradeLevel email phoneNumber",
       populate: [
         { path: "userType", select: "userType" },
         { path: "branch", select: "branch" },
