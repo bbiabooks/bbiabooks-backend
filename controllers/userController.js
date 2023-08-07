@@ -380,7 +380,7 @@ const getPassword = async (req, res) => {
     } else {
       // store report
       const user_id = req.userInfo.id;
-      const action = `Accessed user ${req.params.id} chaneg password details.`;
+      const action = `Accessed user ${user.userId} change password details.`;
       const newReport = new Report({
         user_id,
         action,
