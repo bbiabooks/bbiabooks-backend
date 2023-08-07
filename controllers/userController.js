@@ -336,6 +336,39 @@ const updatePassword = async (req, res) => {
   }
 };
 
+// Get a single Password
+const getPassword = async (req, res) => {
+  try {
+    const user = await Password.findById(req.params.id).populate({
+      path: "userId",
+      select: "firstName lastName branch userType subjectArea gradeLevel",
+      populate: [
+        { path: "userType", select: "userType" },
+        { path: "branch", select: "branch" },
+        { path: "subjectArea", select: "subjectArea" },
+        { path: "gradeLevel", select: "gradeLevel" },
+      ],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    } else {
+      // store report
+      const user_id = req.userInfo.id;
+      const action = `Accessed user ${req.params.id} chaneg password details.`;
+      const newReport = new Report({
+        user_id,
+        action,
+      });
+      await newReport.save();
+
+      res.json(user);
+    }
+  } catch (error) {
+    res.status(500).json({ message: `${error.message}` });
+  }
+};
+
 module.exports = {
   userSignup,
   userLogin,
@@ -344,4 +377,5 @@ module.exports = {
   updateUser,
   deleteUser,
   updatePassword,
+  getPassword,
 };

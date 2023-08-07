@@ -15,6 +15,7 @@ const {
   updateUser,
   deleteUser,
   updatePassword,
+  getPassword,
 } = require("../controllers/userController");
 const {
   getUserTable,
@@ -33,6 +34,7 @@ router.post(
   userSignup
 ); // Create a new User + Signup
 router.get("/admin/passwords", userAuth, adminAuth, getChangePassTable); // All user Change Passwords
+router.get("/admin/passwords/:id", userAuth, adminAuth, getPassword); // Single user Change Password
 router.patch("/admin/:id", upload.single("idPhoto"), userAuth, updateUser); // Update a User by ID
 router.delete("/admin/:id", userAuth, adminAuth, deleteUser); // Delete a User by ID
 
