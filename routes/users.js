@@ -14,8 +14,12 @@ const {
   getUser,
   updateUser,
   deleteUser,
+  updatePassword,
 } = require("../controllers/userController");
-const { getUserTable } = require("../controllers/tables/userTableController");
+const {
+  getUserTable,
+  getChangePassTable,
+} = require("../controllers/tables/userTableController");
 
 /** --- ADMINS . LIBRARIANS . ACCOUNTANTS --- */
 router.get("/table", userAuth, primaryConAuth, getUserTable); // Get all UserTable
@@ -28,12 +32,14 @@ router.post(
   adminAuth,
   userSignup
 ); // Create a new User + Signup
+router.get("/admin/passwords", userAuth, adminAuth, getChangePassTable); // All user Change Passwords
 router.patch("/admin/:id", upload.single("idPhoto"), userAuth, updateUser); // Update a User by ID
 router.delete("/admin/:id", userAuth, adminAuth, deleteUser); // Delete a User by ID
 
 /** --- ALL --- */
 router.post("/login", userLogin); // Authenticate User
 router.get("/:id", userAuth, getUser); // Get a single User by ID
+router.post("/password", updatePassword); // Get a single User by ID
 
 // Error handling middleware
 router.use((err, req, res, next) => {

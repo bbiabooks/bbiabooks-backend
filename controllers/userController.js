@@ -1,6 +1,8 @@
 const { User } = require("../models/userModels");
 const Report = require("../models/reportModels");
 const Signup = require("../models/signupModels");
+const Password = require("../models/passwordModels");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const cloudinary = require("../utils/cloudinary");
@@ -282,6 +284,58 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Update a User Password
+const updatePassword = async (req, res) => {
+  try {
+    let { username, password } = req.body;
+
+    // Check if required field is empty
+    const requiredFields = ["username", "password"];
+
+    // If there's empty
+    const emptyFields = requiredFields.filter((field) => !req.body[field]);
+    if (emptyFields.length > 0) {
+      return res.status(400).json({
+        message: "Please fill in all required fields",
+        emptyFields,
+      });
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      throw new Error("Username does not exists.");
+    } else {
+      const userId = user._id;
+
+      // create token
+      const token = userCreateToken(user._id);
+
+      // Salt for additional security
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(password, salt);
+
+      // Create document
+      const newPassword = new Password({
+        userId,
+        username,
+        password: hash,
+      });
+
+      // Upload document to database
+      await newPassword.save();
+
+      res.status(201).json({
+        message: "New password created successfully",
+        newPassword,
+        token,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `${error.message}` });
+  }
+};
+
 module.exports = {
   userSignup,
   userLogin,
@@ -289,4 +343,5 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
+  updatePassword,
 };
