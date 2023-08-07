@@ -43,7 +43,7 @@ const getChangePassTable = async (req, res) => {
     const passwordTable = await Password.find()
       .populate({
         path: "userId",
-        select: "firstName lastName userType changeStatus",
+        select: "firstName lastName userType",
         populate: [{ path: "userType", select: "userType" }],
       })
       .sort({ createdAt: -1 });
