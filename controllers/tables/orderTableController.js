@@ -15,11 +15,11 @@ const getOrderTable = async (req, res) => {
       })
       .populate({
         path: "reservedFor",
-        select: "_id userType firstName lastName",
-        populate: {
-          path: "userType",
-          select: "_id userType",
-        },
+        select: "_id branch userType firstName lastName",
+        populate: [
+          { path: "branch", select: "_id branch" },
+          { path: "userType", select: "_id userType" },
+        ],
       })
       .sort({ updatedAt: -1 });
 
@@ -49,7 +49,8 @@ const getPaymentTable = async (req, res) => {
       })
       .populate({
         path: "reservedFor",
-        select: "_id firstName lastName",
+        select: "_id branch firstName lastName",
+        populate: [{ path: "branch", select: "_id branch" }],
       })
       .sort({ updatedAt: -1 });
 

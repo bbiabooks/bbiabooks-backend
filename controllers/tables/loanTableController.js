@@ -17,11 +17,11 @@ const getLoanTable = async (req, res) => {
       })
       .populate({
         path: "borrower",
-        select: "_id userType firstName lastName",
-        populate: {
-          path: "userType",
-          select: "_id userType",
-        },
+        select: "_id branch userType firstName lastName",
+        populate: [
+          { path: "branch", select: "_id branch" },
+          { path: "userType", select: "_id userType" },
+        ],
       })
       .sort({ updatedAt: -1 });
 
