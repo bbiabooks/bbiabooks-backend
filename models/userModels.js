@@ -194,7 +194,6 @@ userSchema.statics.signup = async function (
     phoneNumber,
     idPhoto,
     cloudinary_id,
-    userStatus,
   });
 
   return userInfo;
