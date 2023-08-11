@@ -38,7 +38,7 @@ const createLoan = async (req, res) => {
 
     if (validation) {
       throw new Error(
-        "Borrowed Book already exists. You cannot borrow the same book the same day."
+        "Borrowed Book already exists. You cannot borrow the same book."
       );
     } else {
       const books = await Book.findById(book).select(
