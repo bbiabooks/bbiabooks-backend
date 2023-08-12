@@ -61,6 +61,10 @@ const updateOrderDetail = async (req, res) => {
   const { id } = req.params;
   let order = await Order.findById(id);
 
+  const updatedOrder = await Order.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
+
   if (!order) {
     return res.status(404).json({ message: "No such Order" });
   } else {
