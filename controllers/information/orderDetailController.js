@@ -101,6 +101,10 @@ const updateOrderDetail = async (req, res) => {
 
       // Upload the new image
       result = await cloudinary.uploader.upload(req.file.path);
+    } else {
+      const updatedOrder = await Order.findByIdAndUpdate(id, req.body, {
+        new: true,
+      });
     }
 
     if (orderStatus === "released") {
