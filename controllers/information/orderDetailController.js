@@ -60,40 +60,31 @@ const getOrderDetail = async (req, res) => {
 const updateOrderDetail = async (req, res) => {
   const { id } = req.params;
 
-  const updatedOrder = await Order.findByIdAndUpdate(id, req.body, {
-    new: true,
-  });
+  const order = await Order.findById(id);
 
-  if (!updatedOrder) {
+  if (!order) {
     return res.status(404).json({ message: "No such Order" });
   } else {
-    let orderStatus = updatedOrder.orderStatus;
-    const book = updatedOrder.book;
-    const quantity = updatedOrder.quantity;
+    let orderStatus = order.orderStatus;
+    const book = order.book;
+    const quantity = order.quantity;
     let result;
 
     // Check if a new photo is provided
     if (req.file) {
       // Remove the previous image from cloudinary
-      if (updatedOrder.cloudinary_id) {
-        await cloudinary.uploader.destroy(updatedOrder.cloudinary_id);
+      if (order.cloudinary_id) {
+        await cloudinary.uploader.destroy(order.cloudinary_id);
 
         const updatedOrderData = {
-          proofOfPayment: req.file
-            ? result?.secure_url
-            : updatedOrder.proofOfPayment,
-          cloudinary_id: req.file
-            ? result?.public_id
-            : updatedOrder.cloudinary_id,
+          ...req.body,
+          proofOfPayment: req.file ? result?.secure_url : order.proofOfPayment,
+          cloudinary_id: req.file ? result?.public_id : order.cloudinary_id,
         };
 
-        const updatedOrder = await Order.findByIdAndUpdate(
-          id,
-          updatedOrderData,
-          {
-            new: true,
-          }
-        );
+        const order = await Order.findByIdAndUpdate(id, updatedOrderData, {
+          new: true,
+        });
 
         // store report
         const user_id = req.userInfo.id;
