@@ -81,9 +81,13 @@ const updateOrderDetail = async (req, res) => {
           cloudinary_id: req.file ? result?.public_id : order.cloudinary_id,
         };
 
-        const order = await Order.findByIdAndUpdate(id, updatedOrderData, {
-          new: true,
-        });
+        const updatedOrder = await Order.findByIdAndUpdate(
+          id,
+          updatedOrderData,
+          {
+            new: true,
+          }
+        );
 
         // store report
         const user_id = req.userInfo.id;
