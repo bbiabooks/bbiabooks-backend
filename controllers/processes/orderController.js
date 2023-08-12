@@ -14,6 +14,7 @@ const createOrder = async (req, res) => {
     const { book, paymentMethod, reservedFor, orderStatus, quantity } =
       req.body;
     const user_id = req.userInfo.id;
+    const userType = req.userInfo.userType.userType;
     let arrivalDate;
 
     // Check if required field is empty
@@ -32,16 +33,22 @@ const createOrder = async (req, res) => {
     let numberOfCopies = books.numberOfCopies;
 
     if (numberOfCopies > 3) {
-      arrivalDate = Date.now();
-      numberOfCopies = numberOfCopies - quantity;
-
-      const updatedBook = await Book.findByIdAndUpdate(
-        book,
-        { numberOfCopies },
-        {
-          new: true,
+      if (userType === "Student") {
+        if (quantity > 3) {
+          throw new Error("You can't avail more than 3 books as a Student.");
         }
-      );
+      } else {
+        arrivalDate = Date.now();
+        numberOfCopies = numberOfCopies - quantity;
+
+        const updatedBook = await Book.findByIdAndUpdate(
+          book,
+          { numberOfCopies },
+          {
+            new: true,
+          }
+        );
+      }
     }
 
     // Upload the proofOfPayment if it exists
