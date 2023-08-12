@@ -59,8 +59,7 @@ const getOrderDetail = async (req, res) => {
 // Update a single Order
 const updateOrderDetail = async (req, res) => {
   const { id } = req.params;
-
-  const order = await Order.findById(id);
+  let order = await Order.findById(id);
 
   if (!order) {
     return res.status(404).json({ message: "No such Order" });
